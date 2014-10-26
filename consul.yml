@@ -1,0 +1,19 @@
+- hosts: consul_servers
+  user: vagrant
+  sudo: true
+
+  pre_tasks:
+    - name: setup hosts file so the servers can ref one another by hostname
+      lineinfile: "dest=/etc/hosts state=present regexp='^{{item.ip}}' insertafter='^127.0.0.1' line='{{item.ip}} {{item.hostname}}'"
+      with_items:
+        - {ip: '11.0.0.2', hostname: 'consul-1'}
+        - {ip: '11.0.0.3', hostname: 'consul-2'}
+        - {ip: '11.0.0.4', hostname: 'consul-3'}
+
+
+  roles:
+    # use the second interface for vbox as the first is a nat address
+    - {role: sgargan.consul,
+        consul_nodename: "{{inventory_hostname}}",
+        consul_join: '{{groups["consul_servers"]}}',
+        consul_advertise_interface: '{{hostvars[inventory_hostname]["ansible_eth1"]["ipv4"]["address"]}}'}
