@@ -14,6 +14,7 @@
   roles:
     # use the second interface for vbox as the first is a nat address
     - {role: sgargan.consul,
+        consul_server: true,
         consul_nodename: "{{inventory_hostname}}",
         consul_join: '{{groups["consul_servers"]}}',
         consul_advertise_interface: '{{hostvars[inventory_hostname]["ansible_eth1"]["ipv4"]["address"]}}'}
