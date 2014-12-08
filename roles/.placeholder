@@ -1,0 +1,6 @@
+Placeholder for roles dir. To download the required roles from galaxy either 
+run the create_cluster.sh script or each of 
+
+ansible-galaxy install -p roles sgargan.supervisor
+ansible-galaxy install -p roles sgargan.consul
+

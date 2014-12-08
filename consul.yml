@@ -1,3 +1,6 @@
+#
+# Configure a cluster of 3 consul servers
+# 
 - hosts: consul_servers
   user: vagrant
   sudo: true
@@ -12,9 +15,25 @@
 
 
   roles:
-    # use the second interface for vbox as the first is a nat address
+    - {role: sgargan.supervisor }
     - {role: sgargan.consul,
         consul_server: true,
-        consul_nodename: "{{inventory_hostname}}",
+        consul_supervisor_enabled: true,
+        consul_node_name: "{{inventory_hostname}}",
         consul_join: '{{groups["consul_servers"]}}',
-        consul_advertise_interface: '{{hostvars[inventory_hostname]["ansible_eth1"]["ipv4"]["address"]}}'}
+        # use the second interface for vbox as the first is a nat address
+        consul_interface: '{{hostvars[inventory_hostname]["ansible_eth1"]["ipv4"]["address"]}}',
+        consul_client_address: '0.0.0.0'}
+
+# install an agent locally that will join the 3 node server cluster.
+- hosts: localhost
+  connection: local
+  
+  roles:
+
+    - {role: sgargan.consul,
+        consul_supervisor_enabled: true,
+        consul_dir: "{{local_agent_dir}}",
+        consul_node_name: "{{ansible_hostname}}",
+        consul_join: ['11.0.0.2', '11.0.0.3', '11.0.0.4'],
+        consul_client_address: '0.0.0.0'}

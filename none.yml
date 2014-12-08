@@ -1,1 +1,3 @@
+# Dummy playbook file used so that vagrant will generate a valid hosts file.
+# Real provisioning is done by consul.yml after all three servers are created.
 - hosts: none

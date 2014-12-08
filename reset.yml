@@ -1,0 +1,20 @@
+#
+# When you restart your consul cluster you will find that the servers do not 
+# typically bootstrap themselves correctly. This script resets the data on the
+# consul servers and allows them to bootstrap easily. It is mostly useful when the
+# the cluster is used for testing a any registered services or key/value info will
+# be lost.Where data loss is not acceptable you'll need to follow the instructions here.
+#
+# http://www.consul.io/docs/guides/outage.html
+# 
+- hosts: consul_servers
+  user: vagrant
+  sudo: true
+
+  tasks:
+    - debug: msg="Resetting all data on the cluster. Warning this will delete any state you have configured"
+    - supervisorctl: name=consul state=stopped
+    - command: rm -rf /opt/consul/data/
+    - command: /usr/local/bin/supervisord
+      ignore_errors: true
+    - supervisorctl: name='consul' state=restarted
