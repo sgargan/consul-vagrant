@@ -3,16 +3,16 @@
 # consul-vagrant
 #
 # Spins up 3 vagrant vms and configures a  consul cluster cluster on them using Ansible
-# Installs a consul agent on the local machine and configures it to talk to cluster. 
+# Installs a consul agent on the local machine and configures it to talk to cluster.
 #
 echo "Creating Consul cluster..."
 
-if [[ ! -e roles ]]; then
+if [[ ! -e roles/sgargan.consul ]]; then
   echo "Grab roles from github"
   mkdir -p roles
   ansible-galaxy install -p roles sgargan.supervisor
   ansible-galaxy install -p roles sgargan.consul
-  
+
   echo "Generating crypto artifacts for cluster security"
   ./roles/sgargan.consul/files/certs.sh
 fi
