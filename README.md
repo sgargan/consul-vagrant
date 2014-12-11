@@ -47,22 +47,25 @@ This should output as follows
 
 ```bash
 consul-2 | success | rc=0 >>
-Node      Address        Status  Type    Build  Protocol
-consul-2  11.0.0.3:8301  alive   server  0.4.1  2
-consul-3  11.0.0.4:8301  alive   server  0.4.1  2
-consul-1  11.0.0.2:8301  alive   server  0.4.1  2
+Node      Address            Status  Type    Build  Protocol
+consul-2  11.0.0.3:8301      alive   server  0.4.1  2
+consul-3  11.0.0.4:8301      alive   server  0.4.1  2
+consul-1  11.0.0.2:8301      alive   server  0.4.1  2
+sgargan   192.168.0.12:8301  alive   client  0.4.1  2
 
 consul-3 | success | rc=0 >>
-Node      Address        Status  Type    Build  Protocol
-consul-3  11.0.0.4:8301  alive   server  0.4.1  2
-consul-2  11.0.0.3:8301  alive   server  0.4.1  2
-consul-1  11.0.0.2:8301  alive   server  0.4.1  2
+Node      Address            Status  Type    Build  Protocol
+consul-3  11.0.0.4:8301      alive   server  0.4.1  2
+consul-2  11.0.0.3:8301      alive   server  0.4.1  2
+consul-1  11.0.0.2:8301      alive   server  0.4.1  2
+sgargan   192.168.0.12:8301  alive   client  0.4.1  2
 
 consul-1 | success | rc=0 >>
-Node      Address        Status  Type    Build  Protocol
-consul-3  11.0.0.4:8301  alive   server  0.4.1  2
-consul-1  11.0.0.2:8301  alive   server  0.4.1  2
-consul-2  11.0.0.3:8301  alive   server  0.4.1  2
+Node      Address            Status  Type    Build  Protocol
+sgargan   192.168.0.12:8301  alive   client  0.4.1  2
+consul-1  11.0.0.2:8301      alive   server  0.4.1  2
+consul-3  11.0.0.4:8301      alive   server  0.4.1  2
+consul-2  11.0.0.3:8301      alive   server  0.4.1  2
 
 ```
 
@@ -81,3 +84,40 @@ http://www.consul.io/docs/guides/outage.html
 If you restart your VMs you will find that the servers do not bootstrap themselves automatically. This process is manual and annoying in a local vagrant cluster this as you may be often bringing up and down the VMs. If your data is not important and you can afford to lose it you can run the following playbook to delete everything and bootstrap the cluster from scratch.
 
 ansible-playbook -i consul_hosts reset.yml
+
+Troubleshooting
+---------------
+
+Virtualbox networking, at least on OSX, can be flaky; if after you bring up your cluster you see networking errors or certificate errors with lots of flip flopping event messages your virtualbox network stack is usually the culprit. More often than not it requires a restart of your machine to rectify. When the cluster is working correctly your local agent log should look something like the following, if not try a reboot and a reset.
+
+```bash
+==> WARNING: It is highly recommended to set GOMAXPROCS higher than 1
+==> Starting Consul agent...
+==> Starting Consul agent RPC...
+==> Joining cluster...
+Join completed. Synced with 3 initial agents
+==> Consul agent running!
+Node name: 'sgargan'
+Datacenter: 'dc1'
+Server: false (bootstrap: false)
+Client Addr: 0.0.0.0 (HTTP: 8500, DNS: 8600, RPC: 8400)
+Cluster Addr: 192.168.0.12 (LAN: 8301, WAN: 8302)
+Gossip encrypt: true, RPC-TLS: true, TLS-Incoming: true
+
+==> Log data will now stream in as it occurs:
+
+2014/12/11 12:42:31 [INFO] serf: EventMemberJoin: sgargan 192.168.0.12
+2014/12/11 12:42:31 [WARN] serf: Failed to re-join any previously known node
+2014/12/11 12:42:31 [INFO] agent: (LAN) joining: [11.0.0.2 11.0.0.3 11.0.0.4]
+2014/12/11 12:42:31 [INFO] serf: EventMemberJoin: consul-1 11.0.0.2
+2014/12/11 12:42:31 [INFO] serf: EventMemberJoin: consul-3 11.0.0.4
+2014/12/11 12:42:31 [INFO] serf: EventMemberJoin: consul-2 11.0.0.3
+2014/12/11 12:42:31 [INFO] consul: adding server consul-1 (Addr: 11.0.0.2:8300) (DC: dc1)
+2014/12/11 12:42:31 [INFO] consul: adding server consul-3 (Addr: 11.0.0.4:8300) (DC: dc1)
+2014/12/11 12:42:31 [INFO] consul: adding server consul-2 (Addr: 11.0.0.3:8300) (DC: dc1)
+2014/12/11 12:42:31 [INFO] agent: (LAN) joined: 3 Err: <nil>
+2014/12/11 12:42:31 [INFO] agent: Joining cluster...
+2014/12/11 12:42:31 [INFO] agent: (LAN) joining: [11.0.0.2 11.0.0.3 11.0.0.4]
+2014/12/11 12:42:31 [INFO] agent: (LAN) joined: 3 Err: <nil>
+2014/12/11 12:42:31 [INFO] agent: Join completed. Synced with 3 initial agents
+```
