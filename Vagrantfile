@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
   config.vm.box = "vagrantcloud-ubuntu-trusty-64"
-  config.vm.box_url = "http://vagrantcloud.com/ubuntu/boxes/trusty64/versions/1/providers/virtualbox.box"
+  config.vm.box_url = "http://vagrantcloud.com/ubuntu/boxes/trusty64/versions/20160926.0.1/providers/virtualbox.box"
 
   config.vm.provider "virtualbox" do |vm|
     vm.memory = 1024
